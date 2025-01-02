@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .hero {
+            background: url('https://via.placeholder.com/1920x1080') no-repeat center center/cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .hero button {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .hero button:hover {
+            background: #0056b3;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 2rem;
+            background: #f4f4f4;
+        }
+
+        .features .feature {
+            flex: 1;
+            margin: 0 1rem;
+            text-align: center;
+        }
+
+        .features .feature h3 {
+            margin-bottom: 1rem;
+        }
+
+        .features .feature p {
+            font-size: 1rem;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <div>
+        <h1>Welcome to Our Landing Page</h1>
+        <p>Your journey to success starts here</p>
+        <button>Get Started</button>
+    </div>
+</header>
+
+<section class="features">
+    <div class="feature">
+        <h3>Feature 1</h3>
+        <p>Details about the first feature.</p>
+    </div>
+    <div class="feature">
+        <h3>Feature 2</h3>
+        <p>Details about the second feature.</p>
+    </div>
+    <div class="feature">
+        <h3>Feature 3</h3>
+        <p>Details about the third feature.</p>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2025 Landing Page Co. All Rights Reserved.</p>
+</footer>
+</body>
+</html>
