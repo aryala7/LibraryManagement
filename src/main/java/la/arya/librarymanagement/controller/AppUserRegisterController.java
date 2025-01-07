@@ -1,12 +1,10 @@
-package la.arya.librarymanagement.Controller;
+package la.arya.librarymanagement.controller;
 
-import la.arya.librarymanagement.Model.AppUser;
+import la.arya.librarymanagement.model.AppUser;
 import la.arya.librarymanagement.UserRepository;
-import la.arya.librarymanagement.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

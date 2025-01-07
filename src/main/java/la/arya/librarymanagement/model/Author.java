@@ -1,4 +1,4 @@
-package la.arya.librarymanagement.Model;
+package la.arya.librarymanagement.model;
 
 import jakarta.persistence.*;
 

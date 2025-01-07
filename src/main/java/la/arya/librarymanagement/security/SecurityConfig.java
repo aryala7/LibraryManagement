@@ -1,4 +1,4 @@
-package la.arya.librarymanagement.Security;
+package la.arya.librarymanagement.security;
 
 import la.arya.librarymanagement.UserService;
 import lombok.AllArgsConstructor;

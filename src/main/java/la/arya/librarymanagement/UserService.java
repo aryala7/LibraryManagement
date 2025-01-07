@@ -1,6 +1,6 @@
 package la.arya.librarymanagement;
 
-import la.arya.librarymanagement.Model.AppUser;
+import la.arya.librarymanagement.model.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
