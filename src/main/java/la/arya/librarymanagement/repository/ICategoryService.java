@@ -1,6 +1,7 @@
 package la.arya.librarymanagement.repository;
 
 import la.arya.librarymanagement.model.Category;
+import la.arya.librarymanagement.request.category.AddCategoryRequest;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface ICategoryService {
     Category getCategoryByName(String name);
     List<Category> getAllCategories();
 
-    Category addCategory(Category category);
+    Category addCategory(AddCategoryRequest category);
 
     Category updateCategory(Category category, Long id);
 

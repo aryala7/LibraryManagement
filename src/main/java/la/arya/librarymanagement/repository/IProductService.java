@@ -1,8 +1,8 @@
 package la.arya.librarymanagement.repository;
 
 import la.arya.librarymanagement.model.Product;
-import la.arya.librarymanagement.request.AddProductRequest;
-import la.arya.librarymanagement.request.UpdateProductRequest;
+import la.arya.librarymanagement.request.product.AddProductRequest;
+import la.arya.librarymanagement.request.product.UpdateProductRequest;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,11 +1,12 @@
 package la.arya.librarymanagement.controller;
 
+import jakarta.validation.constraints.NotNull;
 import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.IProductService;
-import la.arya.librarymanagement.request.AddProductRequest;
-import la.arya.librarymanagement.request.UpdateProductRequest;
+import la.arya.librarymanagement.request.product.AddProductRequest;
+import la.arya.librarymanagement.request.product.UpdateProductRequest;
 import la.arya.librarymanagement.response.ApiResponse;
 import la.arya.librarymanagement.util.Hashid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ProductController {
 
     @GetMapping("/index")
     public ResponseEntity<ApiResponse> getAllProducts(
-            @RequestParam String hashedCategoryId,
+            @RequestParam @NotNull(message = "categoryId fehlt.") String hashedCategoryId,
             @RequestParam Optional<String> brand,
             @RequestParam Optional<String> searchKey
     ) {

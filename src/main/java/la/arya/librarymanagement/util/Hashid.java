@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Hashid {
-    private Hashids hashids;
+    private final Hashids hashids;
 
-    public void HashIdService() {
+    public Hashid() {
         this.hashids = new Hashids("aryala", 10); //todo: move this to env
     }
 

@@ -1,10 +1,8 @@
-package la.arya.librarymanagement.request;
+package la.arya.librarymanagement.request.category;
 
 import lombok.Data;
 
 @Data
 public class AddCategoryRequest {
-    private Long id;
     private String name;
-    private String slug;
 }

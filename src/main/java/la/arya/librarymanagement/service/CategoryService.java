@@ -1,10 +1,14 @@
 package la.arya.librarymanagement.service;
 
+import la.arya.librarymanagement.dto.CategoryResponse;
+import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.excpetion.AlreadyExistsException;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.repository.CategoryRepository;
 import la.arya.librarymanagement.repository.ICategoryService;
+import la.arya.librarymanagement.request.category.AddCategoryRequest;
+import la.arya.librarymanagement.util.Hashid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,13 @@ public class CategoryService implements ICategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    private final Hashid hashIdService;
+
+    public CategoryService() {
+         this.hashIdService = new Hashid();
+    }
+
 
     @Override
     public Category getCategoryById(Long id) {
@@ -36,12 +47,12 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Category addCategory(Category category) {
-        return Optional.of(category)
-                .filter(c -> categoryRepository.existsByName(c.getName()))
-                .map(categoryRepository::save)
-                .orElseThrow(() -> new AlreadyExistsException(category.getName() + " Already exists!"));
-
+    public Category addCategory(AddCategoryRequest request) {
+        if (categoryRepository.existsByName(request.getName())) {
+            throw new AlreadyExistsException(request.getName() + " Already exists!");
+        }
+        Category category = new Category(request.getName());
+        return categoryRepository.save(category);
     }
 
     @Override
@@ -60,4 +71,5 @@ public class CategoryService implements ICategoryService {
                     throw new ResourceNotFoundException("Category not found!");
                 });
     }
+
 }

@@ -1,4 +1,4 @@
-package la.arya.librarymanagement.request;
+package la.arya.librarymanagement.request.product;
 
 import la.arya.librarymanagement.model.Category;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class AddProductRequest {
+public class UpdateProductRequest {
     private Long id;
 
     private String name;
