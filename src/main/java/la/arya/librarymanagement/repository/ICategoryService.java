@@ -1,5 +1,6 @@
 package la.arya.librarymanagement.repository;
 
+import la.arya.librarymanagement.dto.CategoryResponse;
 import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.request.category.AddCategoryRequest;
 
@@ -18,4 +19,7 @@ public interface ICategoryService {
 
     void deleteCategoryById(Long id);
 
+    List<CategoryResponse> convertToCategoryResponse(List<Category> categories, boolean includeProducts);
+
+    CategoryResponse mapToCategoryResponse(Category category, boolean includeProducts);
 }

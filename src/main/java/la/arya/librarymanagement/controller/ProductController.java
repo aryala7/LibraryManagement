@@ -5,11 +5,13 @@ import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.IProductService;
+import la.arya.librarymanagement.request.product.AddProductRawRequest;
 import la.arya.librarymanagement.request.product.AddProductRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
 import la.arya.librarymanagement.response.ApiResponse;
 import la.arya.librarymanagement.util.Hashid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,20 +38,20 @@ public class ProductController {
     ) {
         Long categoryId = hashIdService.decode(hashedCategoryId);
         List<Product> products = productService.getAllProducts(brand, categoryId,searchKey);
-        return ResponseEntity.ok(new ApiResponse("Success",products));
+        List<ProductResponse> productResponse = productService.getConvertedProducts(products);
+        return ResponseEntity.ok(new ApiResponse("Success",productResponse));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody AddProductRequest product) {
+    public ResponseEntity<ApiResponse> createProduct(@RequestBody AddProductRawRequest rawRequest) {
 
         try {
-            Product createdProduct = productService.addProduct(product);
-            String hashId = hashIdService.encode(createdProduct.getId());
-            ProductResponse response = new ProductResponse(
-                    hashId,
-                    createdProduct.getName()
-            );
-            return ResponseEntity.ok(new ApiResponse("Success",response));
+            AddProductRequest request = new AddProductRequest();
+            BeanUtils.copyProperties(rawRequest, request);
+            request.setCategoryId(hashIdService.decode(rawRequest.getCategoryId()));
+            Product createdProduct = productService.addProduct(request);
+            ProductResponse productResponse = productService.convertToDtoResponse(createdProduct);
+            return ResponseEntity.ok(new ApiResponse("Success",productResponse));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new ApiResponse(e.getMessage(),null));
         }
@@ -77,11 +79,8 @@ public class ProductController {
         try {
             Long id = new Hashid().decode(hash);
             Product updateProduct = productService.updateProduct(product,id);
-            ProductResponse response = new ProductResponse(
-                    hash,
-                    updateProduct.getName()
-            );
-            return ResponseEntity.ok(new ApiResponse("Product Updated!",response));
+            ProductResponse productResponse = productService.convertToDtoResponse(updateProduct);
+            return ResponseEntity.ok(new ApiResponse("Product Updated!",productResponse));
         }
         catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(),null));

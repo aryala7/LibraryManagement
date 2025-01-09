@@ -3,9 +3,9 @@ package la.arya.librarymanagement.controller;
 import la.arya.librarymanagement.dto.CategoryResponse;
 import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.AlreadyExistsException;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.model.Product;
+import la.arya.librarymanagement.repository.CategoryRepository;
 import la.arya.librarymanagement.repository.ICategoryService;
 import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.request.category.AddCategoryRequest;
@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/categories")
@@ -28,13 +30,23 @@ public class CategoryController {
     private final IProductService productService;
 
     private final Hashid hashidService;
+    private final CategoryRepository categoryRepository;
 
-    public CategoryController(ICategoryService categoryService, IProductService productService) {
+
+    public CategoryController(ICategoryService categoryService, IProductService productService, CategoryRepository categoryRepository) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.hashidService = new Hashid();
+        this.categoryRepository = categoryRepository;
     }
 
+
+    @GetMapping("/index")
+    public ResponseEntity<ApiResponse> index() {
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponse> response = categoryService.convertToCategoryResponse(categories,false);
+        return ResponseEntity.ok(new ApiResponse("", response));
+    }
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> createCategory(@RequestBody AddCategoryRequest name) {
@@ -84,44 +96,10 @@ public class CategoryController {
         try {
             Long id = hashidService.decode(hash);
             Category category = categoryService.getCategoryById(id);
-            CategoryResponse response = mapToCategoryResponse(category, includeProducts);
+            CategoryResponse response  = categoryService.mapToCategoryResponse(category,includeProducts);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(null, response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Category not found", e.getMessage()));
         }
-    }
-
-    private CategoryResponse mapToCategoryResponse(Category category,boolean includeProducts) {
-        List<ProductResponse> products = includeProducts ?
-                category.getProducts().stream()
-                        .map(product -> new ProductResponse(
-                                hashidService.encode(product.getId()),
-                                product.getName()
-                        ))
-                        .toList()
-                : null;
-        return new CategoryResponse(
-                this.hashidService.encode(category.getId()),
-                category.getName(),
-                products
-        );
-    }
-    @GetMapping("/{name}/products")
-    public ResponseEntity<ApiResponse> getCategoryProducts(@PathVariable String name) {
-
-        Category category = categoryService.getCategoryByName(name);
-        if (category == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Category not found", category));
-        }
-        List<Product> products = productService.getAllProducts(null,category.getId(),null);
-        if (products.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Product not found", category));
-        }
-        List<ProductResponse> response = products.stream().map(product ->
-                new ProductResponse(
-                    hashidService.encode(product.getId()),
-                    product.getName())
-        ).toList();
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(null, response));
     }
 }

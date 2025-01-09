@@ -5,16 +5,21 @@ import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.excpetion.AlreadyExistsException;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.CategoryRepository;
 import la.arya.librarymanagement.repository.ICategoryService;
+import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.request.category.AddCategoryRequest;
 import la.arya.librarymanagement.util.Hashid;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class CategoryService implements ICategoryService {
 
@@ -24,10 +29,9 @@ public class CategoryService implements ICategoryService {
 
     private final Hashid hashIdService;
 
-    public CategoryService() {
-         this.hashIdService = new Hashid();
-    }
+    private final IProductService productService;
 
+    private final ModelMapper modelMapper;
 
     @Override
     public Category getCategoryById(Long id) {
@@ -70,6 +74,25 @@ public class CategoryService implements ICategoryService {
                 .ifPresentOrElse(categoryRepository::delete, () -> {
                     throw new ResourceNotFoundException("Category not found!");
                 });
+    }
+
+
+    @Override
+    public List<CategoryResponse> convertToCategoryResponse(List<Category> categories, boolean includeProducts) {
+        return categories.stream().map((category) -> mapToCategoryResponse(category,includeProducts)).toList();
+    }
+    @Override
+    public CategoryResponse mapToCategoryResponse(Category category, boolean includeProducts) {
+        List<ProductResponse> productResponse = null;
+        if (includeProducts) {
+            List<Product> products = category.getProducts();
+            productResponse = productService.getConvertedProducts(products);
+        }
+
+        CategoryResponse categoryResponse = modelMapper.map(category, CategoryResponse.class);
+        categoryResponse.setHashId(this.hashIdService.encode(category.getId()));
+        categoryResponse.setProducts(productResponse);
+        return categoryResponse;
     }
 
 }

@@ -1,13 +1,18 @@
 package la.arya.librarymanagement.service;
 
+import la.arya.librarymanagement.dto.ImageResponse;
+import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Category;
+import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.CategoryRepository;
 import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.repository.ProductRepository;
 import la.arya.librarymanagement.request.product.AddProductRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -15,24 +20,22 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class ProductService implements IProductService {
 
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
     private CategoryRepository categoryRepository;
+
+    private final ModelMapper modelmapper;
 
     @Override
     public Product addProduct(AddProductRequest request) {
         // check if the category exists.
-        Category category = Optional
-                .ofNullable(categoryRepository.findByName(request.getCategory().getName()))
-                .orElseGet(() -> {
-                    Category newCategory = new Category(request.getCategory().getName());
-                    return categoryRepository.save(newCategory);
-                });
-        request.setCategory(category);
+        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         return productRepository.save(createProduct(request, category));
     }
 
@@ -123,5 +126,22 @@ public class ProductService implements IProductService {
     @Override
     public Long CountProductByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand,name);
+    }
+
+    @Override
+    public List<ProductResponse> getConvertedProducts(List<Product> products) {
+        return products.stream().map(this::convertToDtoResponse).toList();
+    }
+    @Override
+    public ProductResponse convertToDtoResponse(Product product) {
+        ProductResponse productResponse =  modelmapper.map(product, ProductResponse.class);
+        List<Image> images = product.getImages();
+        List<ImageResponse> imageResponse = images
+                .stream()
+                .map((image) -> modelmapper.map(image, ImageResponse.class))
+                .toList();
+
+        productResponse.setImages(imageResponse);
+        return productResponse;
     }
 }

@@ -1,5 +1,6 @@
 package la.arya.librarymanagement.repository;
 
+import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.request.product.AddProductRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
@@ -26,4 +27,8 @@ public interface IProductService {
 
 
     Long CountProductByBrandAndName(String brand, String name);
+
+    List<ProductResponse> getConvertedProducts(List<Product> products);
+
+    ProductResponse convertToDtoResponse(Product product);
 }

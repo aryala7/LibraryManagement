@@ -4,12 +4,13 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+// This captures the raw request from the user
 @Data
-public class AddProductRequest {
+public class AddProductRawRequest {
     private String name;
     private String description;
     private BigDecimal price;
     private int inventory;
     private String brand;
-    private Long categoryId;    // decoded id
+    private String categoryId;  // encoded hashid
 }
