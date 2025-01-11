@@ -9,6 +9,7 @@ import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.request.product.AddProductRawRequest;
 import la.arya.librarymanagement.request.product.AddProductRequest;
+import la.arya.librarymanagement.request.product.UpdateProductRawRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
 import la.arya.librarymanagement.response.ApiResponse;
 import la.arya.librarymanagement.util.Hashid;
@@ -38,12 +39,12 @@ public class ProductController {
 
     @GetMapping("/index")
     public ResponseEntity<ApiResponse> getAllProducts(
-            @RequestParam @NotNull(message = "categoryId fehlt.") String hashedCategoryId,
+            @RequestParam @NotNull(message = "categoryId fehlt.") String categoryId,
             @RequestParam Optional<String> brand,
             @RequestParam Optional<String> searchKey
     ) {
-        Long categoryId = hashIdService.decode(hashedCategoryId);
-        List<Product> products = productService.getAllProducts(brand, categoryId,searchKey);
+        Long decodedCategoryId = hashIdService.decode(categoryId);
+        List<Product> products = productService.getAllProducts(brand, decodedCategoryId,searchKey);
         List<ProductResponse> productResponse = productService.getConvertedProducts(products);
         return ResponseEntity.ok(new ApiResponse("Success",productResponse));
     }
@@ -75,7 +76,8 @@ public class ProductController {
         try {
             Long id = new Hashid().decode(hash);
             Product product = productService.getProductById(id);
-            return ResponseEntity.ok(new ApiResponse("Success",product));
+            ProductResponse response = productService.convertToDtoResponse(product);
+            return ResponseEntity.ok(new ApiResponse("Success",response));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(),null));
         }
@@ -85,12 +87,18 @@ public class ProductController {
     @PutMapping("/{hash}")
     public ResponseEntity<ApiResponse> updateProduct(
             @PathVariable String hash,
-            @RequestBody UpdateProductRequest product
+            @RequestBody UpdateProductRawRequest rawRequest
     ) {
 
         try {
-            Long id = new Hashid().decode(hash);
-            Product updateProduct = productService.updateProduct(product,id);
+            Long id = hashIdService.decode(hash);
+            UpdateProductRequest request = new UpdateProductRequest();
+            BeanUtils.copyProperties(rawRequest, request);
+
+            Long decodedId = hashIdService.decode(rawRequest.getCategoryId());
+
+            request.setCategoryId(decodedId);
+            Product updateProduct = productService.updateProduct(request,id);
             ProductResponse productResponse = productService.convertToDtoResponse(updateProduct);
             return ResponseEntity.ok(new ApiResponse("Product Updated!",productResponse));
         }

@@ -7,12 +7,10 @@ import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.model.Product;
-import la.arya.librarymanagement.repository.CategoryRepository;
-import la.arya.librarymanagement.repository.IImageService;
-import la.arya.librarymanagement.repository.IProductService;
-import la.arya.librarymanagement.repository.ProductRepository;
+import la.arya.librarymanagement.repository.*;
 import la.arya.librarymanagement.request.product.AddProductRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
+import la.arya.librarymanagement.util.Hashid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,8 @@ public class ProductService implements IProductService {
     private IImageService imageService;
 
     private final ModelMapper modelmapper;
+
+    private final Hashid hashIdService;
 
     @Override
     public Product addProduct(AddProductRequest request) throws IOException {
@@ -85,7 +85,7 @@ public class ProductService implements IProductService {
             existingProduct.setDescription(request.getDescription());
 
 
-            Category category = categoryRepository.findByName(request.getCategory().getName());
+            Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             existingProduct.setCategory(category);
             return existingProduct;
 
@@ -104,7 +104,7 @@ public class ProductService implements IProductService {
 
         Specification<Product> specification = Specification.where(null);
 
-        specification = specification.and(((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("category"), categoryId)));
+        specification = specification.and(((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("category").get("id"), categoryId)));
 
         if (brand.isPresent()) {
             specification = specification.and(
@@ -144,7 +144,9 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse convertToDtoResponse(Product product) {
         ProductResponse productResponse =  modelmapper.map(product, ProductResponse.class);
+        productResponse.setHashId(hashIdService.encode(product.getId()));
         CategoryResponse categoryResponse = modelmapper.map(product.getCategory(), CategoryResponse.class);
+        categoryResponse.setHashId(hashIdService.encode(product.getCategory().getId()));
         productResponse.setCategory(categoryResponse);
         return productResponse;
     }
