@@ -3,7 +3,7 @@ services:
   godpostgresdb:
     image: postgres
     restart: always
-    shm_size: 128mb
+    shm_size: 256mb
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -28,6 +28,8 @@ services:
       - "8080:8080"
     depends_on:
       - godpostgresdb
+    volumes:
+      - ./uploads:/var/www/uploads
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://godpostgresdb:5432/librarymanagement
       SPRING_DATASOURCE_USERNAME: arya

@@ -4,40 +4,77 @@ import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.repository.IImageService;
+import la.arya.librarymanagement.request.FileForm;
 import la.arya.librarymanagement.response.ApiResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
 @RequestMapping("${api.prefix}/images")
 public class ImageController {
 
+    @Value("${file.storage.directory}")
+    private String storageDirectory;
     private final IImageService imageService;
     public ImageController(IImageService imageService) {
         this.imageService = imageService;
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<ApiResponse> saveImages(List<MultipartFile> files, @RequestParam Long product_id) {
+    public ResponseEntity<ApiResponse> handleFileUploadUsingCurl(
+            @ModelAttribute FileForm fileForm) throws IOException {
+        ImageResponse image = imageService.uploadImage(fileForm.getFile());
+
+        return ResponseEntity.ok(new ApiResponse("Success",image));
+    }
+
+    @GetMapping("/{fileName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
 
         try {
-            List<ImageResponse> imageDtos = imageService.saveImages(files,product_id);
-            return ResponseEntity.ok(new ApiResponse("Upload Success!", imageDtos));
-        }catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("Upload Failed!", e.getMessage()));
+            Path path = Paths.get(storageDirectory).resolve(fileName).normalize();
+            Resource resource = new UrlResource(path.toUri());
+            System.out.println(resource.exists() + "exists or not");
+            System.out.println(resource.isReadable() + "readable or not");
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }catch (MalformedURLException e) {
+            return ResponseEntity.badRequest().build();
         }
 
     }
+
+//    @PostMapping("/upload")
+//    public ResponseEntity<ApiResponse> saveImages(List<MultipartFile> files, @RequestParam Long product_id) {
+//
+//        try {
+//            List<ImageResponse> imageDtos = imageService.saveImages(files,product_id);
+//            return ResponseEntity.ok(new ApiResponse("Upload Success!", imageDtos));
+//        }catch (Exception e){
+//            return ResponseEntity
+//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new ApiResponse("Upload Failed!", e.getMessage()));
+//        }
+//
+//    }
 
     @GetMapping("/download/{fileName}")
     public ResponseEntity<?> downloadImage(@PathVariable String fileName) {

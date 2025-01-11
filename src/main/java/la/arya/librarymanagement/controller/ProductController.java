@@ -1,9 +1,11 @@
 package la.arya.librarymanagement.controller;
 
 import jakarta.validation.constraints.NotNull;
+import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Product;
+import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.request.product.AddProductRawRequest;
 import la.arya.librarymanagement.request.product.AddProductRequest;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,9 @@ public class ProductController {
 
     @Autowired
     private final IProductService productService;
+
+    @Autowired
+    private final IImageService imageService;
 
     private final Hashid hashIdService;
 
@@ -43,17 +49,23 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody AddProductRawRequest rawRequest) {
-
+    public ResponseEntity<ApiResponse> createProduct(@ModelAttribute AddProductRawRequest rawRequest) throws IOException {
         try {
             AddProductRequest request = new AddProductRequest();
             BeanUtils.copyProperties(rawRequest, request);
-            request.setCategoryId(hashIdService.decode(rawRequest.getCategoryId()));
+
+            Long decodedId = hashIdService.decode(rawRequest.getCategoryId());
+
+            request.setCategoryId(decodedId);
             Product createdProduct = productService.addProduct(request);
             ProductResponse productResponse = productService.convertToDtoResponse(createdProduct);
-            return ResponseEntity.ok(new ApiResponse("Success",productResponse));
+            productResponse.setHashId(hashIdService.encode(createdProduct.getId()));
+            productResponse.getCategory().setHashId(rawRequest.getCategoryId());
+            List<ImageResponse> uploadedImages = imageService.saveImages(request.getFiles(),createdProduct);
+            productResponse.setImages(uploadedImages);
+            return ResponseEntity.ok(new ApiResponse("Success", productResponse));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ApiResponse(e.getMessage(),null));
+            return ResponseEntity.internalServerError().body(new ApiResponse(e.getMessage(), null));
         }
     }
 

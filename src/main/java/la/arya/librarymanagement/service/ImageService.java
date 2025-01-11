@@ -5,10 +5,10 @@ import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
 import la.arya.librarymanagement.repository.IImageService;
-import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.repository.ImageRepository;
 import la.arya.librarymanagement.util.checksumUtil;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,8 @@ public class ImageService implements IImageService {
     @Autowired
     private final ImageRepository imageRepository;
 
-    private final IProductService productService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public Image getImageById(Long id) {
@@ -38,6 +39,7 @@ public class ImageService implements IImageService {
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("no image found with this id " + id));
     }
+
 
     @Override
     public Image getImageByName(String name) {
@@ -52,12 +54,42 @@ public class ImageService implements IImageService {
     }
 
     @Override
-    public List<ImageResponse> saveImages(List<MultipartFile> files, Long product_id) throws IOException {
-        Product product = productService.getProductById(product_id);
+    public ImageResponse uploadImage(MultipartFile file) throws IOException {
+        Files.createDirectories(Paths.get(storageDirectory));
+        String fileName = file.getOriginalFilename();
+        String filePath = storageDirectory + File.separator + fileName;
+
+        File targetFile = new File(filePath);
+        try(FileOutputStream fos = new FileOutputStream(targetFile)) {
+            fos.write(file.getBytes());
+        }catch (IOException e){
+            throw new RuntimeException("failed to write image to file " + filePath);
+        }
+
+        String checksum;
+        try(InputStream fileInputStream = file.getInputStream()) {
+            checksum = checksumUtil.calculateChecksum(fileInputStream,"SHA-256");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Image image = new Image();
+        image.setFileName(fileName);
+        image.setFileType(file.getContentType());
+        image.setDownloadUrl(filePath);
+        image.setChecksum(checksum);
+
+        imageRepository.save(image);
+
+        return convertToImageDtoResponse(image);
+    }
+    @Override
+    public List<ImageResponse> saveImages(List<MultipartFile> files, Product product) throws IOException {
         List<ImageResponse> savedFiles = new ArrayList<>();
 
         Files.createDirectories(Paths.get(storageDirectory));
 
+        List<Image> images = new ArrayList<>();
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
                 continue;
@@ -85,16 +117,22 @@ public class ImageService implements IImageService {
             image.setChecksum(checksum);
             image.setProduct(product);
 
-            Image savedImage = imageRepository.save(image);
-            ImageResponse imageDto = new ImageResponse();
-            imageDto.setId(savedImage.getId());
-            imageDto.setName(savedImage.getFileName());
-            imageDto.setDownloadUrl(savedImage.getDownloadUrl());
-            savedFiles.add(imageDto);
+            images.add(image);
         }
 
-        return savedFiles;
+        imageRepository.saveAll(images);
+        return getConvertedResponse(images);
+    }
 
+    @Override
+    public List<ImageResponse> getConvertedResponse(List<Image> images) {
+        return images.stream().map(this::convertToImageDtoResponse).toList();
+    }
+
+
+    @Override
+    public ImageResponse convertToImageDtoResponse(Image image) {
+        return  modelMapper.map(image, ImageResponse.class);
     }
 
     @Override

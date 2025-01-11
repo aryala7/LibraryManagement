@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ImageResponse {
-    private Long id;
-    private String name;
-    private String downloadUrl;
+    private String fileName;
+    private String fileType;
 }

@@ -18,4 +18,5 @@ public class ProductResponse {
     private BigDecimal price;
     private String brand;
     private List<ImageResponse> images;
+    private CategoryResponse category;
 }

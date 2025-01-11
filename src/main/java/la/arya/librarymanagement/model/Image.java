@@ -12,7 +12,8 @@ import lombok.Setter;
 public class Image {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "image_sequence")
+    @SequenceGenerator(name = "image_sequence", sequenceName = "image_sequence", allocationSize = 1)
     private Long id;
 
     private String fileName;

@@ -5,11 +5,12 @@ import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.request.product.AddProductRequest;
 import la.arya.librarymanagement.request.product.UpdateProductRequest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 public interface IProductService {
-    Product addProduct(AddProductRequest request);
+    Product addProduct(AddProductRequest request) throws IOException;
 
     Product getProductById(Long id);
 

@@ -1,5 +1,6 @@
 package la.arya.librarymanagement.service;
 
+import la.arya.librarymanagement.dto.CategoryResponse;
 import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.dto.ProductResponse;
 import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
@@ -7,6 +8,7 @@ import la.arya.librarymanagement.model.Category;
 import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.CategoryRepository;
+import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.repository.IProductService;
 import la.arya.librarymanagement.repository.ProductRepository;
 import la.arya.librarymanagement.request.product.AddProductRequest;
@@ -16,7 +18,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,16 +34,21 @@ public class ProductService implements IProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private IImageService imageService;
+
     private final ModelMapper modelmapper;
 
     @Override
-    public Product addProduct(AddProductRequest request) {
+    public Product addProduct(AddProductRequest request) throws IOException {
         // check if the category exists.
         Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
         return productRepository.save(createProduct(request, category));
     }
 
     private Product createProduct(AddProductRequest request,Category category) {
+
         return new Product(
                 request.getName(),
                 request.getBrand(),
@@ -135,13 +144,8 @@ public class ProductService implements IProductService {
     @Override
     public ProductResponse convertToDtoResponse(Product product) {
         ProductResponse productResponse =  modelmapper.map(product, ProductResponse.class);
-        List<Image> images = product.getImages();
-        List<ImageResponse> imageResponse = images
-                .stream()
-                .map((image) -> modelmapper.map(image, ImageResponse.class))
-                .toList();
-
-        productResponse.setImages(imageResponse);
+        CategoryResponse categoryResponse = modelmapper.map(product.getCategory(), CategoryResponse.class);
+        productResponse.setCategory(categoryResponse);
         return productResponse;
     }
 }
