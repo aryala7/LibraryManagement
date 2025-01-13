@@ -5,6 +5,7 @@ import la.arya.librarymanagement.model.Basket;
 import la.arya.librarymanagement.repository.IBasketService;
 import la.arya.librarymanagement.request.basket.AddBasketRawRequest;
 import la.arya.librarymanagement.request.basket.AddBasketRequest;
+import la.arya.librarymanagement.request.basket.UpdateBasketRequest;
 import la.arya.librarymanagement.response.ApiResponse;
 import la.arya.librarymanagement.util.Hashid;
 import org.springframework.beans.BeanUtils;
@@ -43,16 +44,36 @@ public class BasketController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> addBasket(@RequestBody AddBasketRawRequest rawRequest) {
-        Long decodedProductId = hashIdService.decode(rawRequest.getProductHashId());
 
-        AddBasketRequest request = new AddBasketRequest();
+        try {
+            Long decodedProductId = hashIdService.decode(rawRequest.getProductHashId());
 
-        BeanUtils.copyProperties(rawRequest,request);
+            AddBasketRequest request = new AddBasketRequest();
 
-        request.setProductId(decodedProductId);
+            BeanUtils.copyProperties(rawRequest,request);
 
-        BasketResponse response =  basketService.createBasket(request);
+            request.setProductId(decodedProductId);
 
-        return ResponseEntity.ok(new ApiResponse("Success",response));
+            BasketResponse response =  basketService.createBasket(request);
+
+            return ResponseEntity.ok(new ApiResponse("Success",response));
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),e));
+        }
+
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<ApiResponse> addItemToBasket(@RequestBody UpdateBasketRequest request) {
+
+        try {
+            Long decodedBasketId = hashIdService.decode(request.getBasketId());
+            Long decodedProductId = hashIdService.decode(request.getProductId());
+            BasketResponse response = basketService.addItemToBasket(decodedBasketId,decodedProductId,request.getQuantity());
+            return ResponseEntity.ok(new ApiResponse("Success",response));
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),e));
+        }
+
     }
 }

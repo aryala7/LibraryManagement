@@ -17,7 +17,7 @@ public interface IBasketService {
 
     public BasketResponse createBasket(AddBasketRequest request);
 
-    public Basket addItemToBasket(Long id, Long itemId);
+    public BasketResponse addItemToBasket(Long id, Long itemId,Integer quantity);
 
     public Basket removeItemFromBasket(Long id, Long itemId);
 
