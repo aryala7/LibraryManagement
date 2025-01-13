@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
-
+import java.util.Set;
 
 
 @NoArgsConstructor
@@ -51,4 +51,11 @@ public class Product {
         this.brand = brand;
         this.category = category;
     }
+
+    @ManyToMany(mappedBy = "products")
+    private Set<Basket> baskets;
+
+
+    @OneToMany(mappedBy = "product")
+    private Set<BasketProduct> basketProducts;
 }
