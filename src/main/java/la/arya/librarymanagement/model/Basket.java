@@ -54,7 +54,7 @@ public class Basket {
         basketProduct.setProduct(product);
         basketProduct.setPrice(price);
         basketProduct.setQuantity(quantity);
-        basketProduct.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        basketProduct.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         this.basketProducts.add(basketProduct);
     }
@@ -65,7 +65,7 @@ public class Basket {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     public Integer calculateItemCount() {
-        return  this.basketProducts.size();
+        return  this.basketProducts.stream().map(BasketProduct::getQuantity).reduce(0, Integer::sum);
     }
 
 }

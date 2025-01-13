@@ -11,7 +11,10 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Entity
-@Table(name = "basket_product")
+@Table(name = "basket_product",indexes = {
+        @Index(name = "idx_product_id",columnList = "product_id"),
+        @Index(name = "idx_basket_id",columnList = "basket_id")
+})
 public class BasketProduct {
 
     @EmbeddedId

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -65,16 +66,29 @@ public class BasketService implements IBasketService {
 
 
     @Override
-    public Basket addItemToBasket(Long basketId, Long itemId) {
+    public BasketResponse addItemToBasket(Long basketId, Long itemId, Integer quantity) {
 
-        Basket basket = basketRepository.findById(basketId).orElseThrow( () -> new ResourceNotFoundException("Basket not found"));
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        Basket basket = basketRepository.findByIdWithBasketProducts(basketId).orElseThrow( () -> new ResourceNotFoundException("Basket not found"));
         Product product = productService.getProductById(itemId);
-//
-//        Set<Product> products = basket.getProducts();
-//        products.add(product);
-//        basketRepository.save(basket);
-//        Basket updatedBasket = basket.setTotalPrice(calculateTotalAmount(products));
-        return basket;
+
+        Optional<BasketProduct> existingProduct = basket.getBasketProducts()
+                        .stream()
+                        .filter(basketProduct -> basketProduct.getProduct().getId().equals(product.getId()))
+                        .findFirst();
+
+        if (existingProduct.isPresent()) {
+           BasketProduct basketProduct = existingProduct.get();
+           basketProduct.setQuantity(basketProduct.getQuantity() + 1);
+        }else {
+            basket.addProduct(product,product.getPrice(),1);
+        }
+        basket.setItemCount(basket.calculateItemCount());
+        basket.setTotalPrice(basket.calculateTotalAmount());
+        Basket updatedBasket =  basketRepository.save(basket);
+        return mapToBasketResponse(updatedBasket);
     }
 
     @Override
