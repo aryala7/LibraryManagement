@@ -50,8 +50,6 @@ public class BasketService implements IBasketService {
 
         Basket basket = new Basket();
         basket.addProduct(product,product.getPrice(),request.getQuantity());
-        basket.setTotalPrice(basket.calculateTotalAmount());
-        basket.setItemCount(basket.calculateItemCount());
         return mapToBasketResponse(basketRepository.save(basket));
     }
 
@@ -68,9 +66,6 @@ public class BasketService implements IBasketService {
     @Override
     public BasketResponse addItemToBasket(Long basketId, Long itemId, Integer quantity) {
 
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
-        }
         Basket basket = basketRepository.findByIdWithBasketProducts(basketId).orElseThrow( () -> new ResourceNotFoundException("Basket not found"));
         Product product = productService.getProductById(itemId);
 
@@ -85,15 +80,26 @@ public class BasketService implements IBasketService {
         }else {
             basket.addProduct(product,product.getPrice(),1);
         }
-        basket.setItemCount(basket.calculateItemCount());
-        basket.setTotalPrice(basket.calculateTotalAmount());
         Basket updatedBasket =  basketRepository.save(basket);
         return mapToBasketResponse(updatedBasket);
     }
 
     @Override
-    public Basket removeItemFromBasket(Long id, Long itemId) {
-        return null;
+    public BasketResponse removeItemFromBasket(Long id, Long itemId) {
+            Optional<Basket> existingBasket = basketRepository.findByIdWithBasketProducts(id);
+            if (existingBasket.isPresent()) {
+                Basket basket = existingBasket.get();
+                BasketProduct productToRemoveFromBasket = basket.getBasketProducts()
+                        .stream()
+                        .filter(bp -> bp.getProduct().getId().equals(itemId))
+                        .findFirst()
+                        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                basket.getBasketProducts().remove(productToRemoveFromBasket);
+
+                basketRepository.save(basket);
+                return mapToBasketResponse(basket);
+            }
+        throw new ResourceNotFoundException("Basket not found");
     }
 
     @Override

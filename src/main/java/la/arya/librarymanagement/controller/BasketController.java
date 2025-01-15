@@ -5,8 +5,10 @@ import la.arya.librarymanagement.model.Basket;
 import la.arya.librarymanagement.repository.IBasketService;
 import la.arya.librarymanagement.request.basket.AddBasketRawRequest;
 import la.arya.librarymanagement.request.basket.AddBasketRequest;
+import la.arya.librarymanagement.request.basket.RemoveItemRequest;
 import la.arya.librarymanagement.request.basket.UpdateBasketRequest;
 import la.arya.librarymanagement.response.ApiResponse;
+import la.arya.librarymanagement.service.BasketService;
 import la.arya.librarymanagement.util.Hashid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +76,18 @@ public class BasketController {
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),e));
         }
+    }
+
+    @PostMapping("/remove-item")
+    public ResponseEntity<ApiResponse> removeItemFromCart(@RequestBody RemoveItemRequest request) {
+           try {
+               Long decodedId = hashIdService.decode(request.getBasketId());
+               Long decodedProductId = hashIdService.decode(request.getProductId());
+               BasketResponse response = basketService.removeItemFromBasket(decodedId,decodedProductId);
+               return ResponseEntity.ok(new ApiResponse("Success",response));
+           }catch (Exception e) {
+               return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage(),e));
+           }
 
     }
 }

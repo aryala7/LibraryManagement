@@ -19,7 +19,7 @@ public interface IBasketService {
 
     public BasketResponse addItemToBasket(Long id, Long itemId,Integer quantity);
 
-    public Basket removeItemFromBasket(Long id, Long itemId);
+    public BasketResponse removeItemFromBasket(Long id, Long itemId);
 
     public Basket clearBasket(Long id);
 

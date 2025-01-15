@@ -41,6 +41,17 @@ public class Basket {
     private Set<BasketProduct> basketProducts = new HashSet<>();
 
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @PrePersist
+    @PreUpdate
+    public void updateBasketDetails() {
+        this.itemCount = calculateItemCount();
+        this.totalPrice = calculateTotalAmount();
+    }
+
     public void addProduct(Product product, BigDecimal price, Integer quantity) {
         BasketProduct basketProduct = new BasketProduct();
 
