@@ -43,6 +43,9 @@ public class Product {
     private Category category;
 
 
+    @ManyToMany(mappedBy = "products")
+    private Set<Order> orders;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Image> images;
 

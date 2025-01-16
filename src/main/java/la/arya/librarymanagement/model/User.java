@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -54,6 +56,14 @@ public class User {
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = Timestamp.from(Instant.now());
+        hashPassword();
+    }
+
+    public void hashPassword() {
+        if (this.password != null && !this.password.isEmpty()) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            this.password = passwordEncoder.encode(this.password);
+        }
     }
 
 }

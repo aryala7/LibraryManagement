@@ -83,7 +83,6 @@ public class Basket {
         basketProduct.setProduct(product);
         basketProduct.setPrice(price);
         basketProduct.setQuantity(quantity);
-        basketProduct.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         this.basketProducts.add(basketProduct);
     }

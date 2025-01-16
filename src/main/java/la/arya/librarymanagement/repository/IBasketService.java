@@ -31,4 +31,6 @@ public interface IBasketService {
     BasketProductResponse mapToBasketProductResponse(BasketProduct basketProduct);
 
     List<BasketProductResponse> convertToBasketProductResponse(Set<BasketProduct> basketProducts);
+
+    Basket getBasketByUserId(Long userId);
 }

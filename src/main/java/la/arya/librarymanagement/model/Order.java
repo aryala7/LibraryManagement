@@ -60,10 +60,36 @@ public class Order {
         Timestamp now = Timestamp.from(Instant.now());
         this.createdAt = now;
         this.updatedAt = now;
+        this.totalAmount = calculateTotalAmount();
     }
 
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = Timestamp.from(Instant.now());
+        this.totalAmount = calculateTotalAmount();
+    }
+
+    public BigDecimal calculateTotalAmount() {
+        return this.orderProducts.stream()
+                .map(op-> op.getTotalPrice().multiply(new BigDecimal(op.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    public Integer calculateItemCount() {
+        return this.orderProducts.stream().map(OrderProduct::getQuantity).reduce(0, Integer::sum);
+    }
+
+    public void addProduct(Product product,BigDecimal totalPrice, Integer quantity) {
+        OrderProduct orderProduct = new OrderProduct();
+
+        OrderProductKey key = new OrderProductKey();
+        key.setProductId(product.getId());
+        key.setOrderId(id);
+
+        orderProduct.setId(key);
+        orderProduct.setTotalPrice(totalPrice);
+        orderProduct.setQuantity(quantity);
+        orderProduct.setProduct(product);
+
+        this.orderProducts.add(orderProduct);
     }
 }

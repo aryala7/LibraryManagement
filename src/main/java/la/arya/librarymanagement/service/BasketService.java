@@ -135,4 +135,9 @@ public class BasketService implements IBasketService {
     public List<BasketProductResponse> convertToBasketProductResponse(Set<BasketProduct> basketProducts) {
         return basketProducts.stream().map(this::mapToBasketProductResponse).toList();
     }
+
+    @Override
+    public Basket getBasketByUserId(Long userId) {
+        return basketRepository.findByUserIdWithBasketProducts(userId);
+    }
 }
