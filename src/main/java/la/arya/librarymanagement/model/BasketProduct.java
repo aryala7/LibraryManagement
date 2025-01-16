@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,9 +36,21 @@ public class BasketProduct {
 
     private Integer quantity;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at",nullable = false,updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at",nullable = false)
     private Timestamp updatedAt;
+
+    @PrePersist
+    protected  void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected  void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 }

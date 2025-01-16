@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,8 +31,23 @@ public class OrderProduct {
     public Product product;
 
 
-    private Timestamp createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    protected Timestamp createdAt;
 
-    private Timestamp updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    protected Timestamp updatedAt;
+
+
+    @PrePersist
+    public void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 
 }

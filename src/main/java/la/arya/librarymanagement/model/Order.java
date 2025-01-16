@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,4 +42,24 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    protected Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    protected Timestamp updatedAt;
+
+
+    @PrePersist
+    public void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 }

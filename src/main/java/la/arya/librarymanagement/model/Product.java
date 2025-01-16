@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -58,4 +60,24 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private Set<BasketProduct> basketProducts;
+
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    protected Timestamp createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    protected Timestamp updatedAt;
+
+
+    @PrePersist
+    public void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 }

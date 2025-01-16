@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,8 +46,23 @@ public class Basket {
     @JoinColumn(name = "user_id")
     private User user;
 
+
     @PrePersist
+    public void onCreate() {
+        Timestamp now = Timestamp.from(Instant.now());
+        this.createdAt =  now;
+        this.updatedAt = now;
+        updateBasketDetails();
+    }
+
+
     @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+        updateBasketDetails();
+    }
+
+
     public void updateBasketDetails() {
         this.itemCount = calculateItemCount();
         this.totalPrice = calculateTotalAmount();
@@ -78,5 +94,12 @@ public class Basket {
     public Integer calculateItemCount() {
         return  this.basketProducts.stream().map(BasketProduct::getQuantity).reduce(0, Integer::sum);
     }
+
+    @Column(name = "created_at",nullable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at",nullable = false)
+    private Timestamp updatedAt;
+
 
 }
