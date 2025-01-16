@@ -2,6 +2,7 @@ package la.arya.librarymanagement.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -11,7 +12,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@NoArgsConstructor
+@Table(name = "users",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User {
 
     @Id
@@ -22,6 +25,7 @@ public class User {
     private  String firstName;
     private  String lastName;
 
+    @Column(nullable = false,unique = true)
     private  String email;
 
     private  String password;

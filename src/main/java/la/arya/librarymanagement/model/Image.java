@@ -3,6 +3,7 @@ package la.arya.librarymanagement.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name="images")
 public class Image {
 

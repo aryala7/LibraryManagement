@@ -3,6 +3,7 @@ package la.arya.librarymanagement.model;
 import jakarta.persistence.*;
 import la.arya.librarymanagement.enums.OrderStatus;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -14,7 +15,10 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "orders")
+@NoArgsConstructor
+@Table(name = "orders",indexes = {
+        @Index(name = "idx_user_id",columnList = "user_id"),
+})
 public class Order {
 
     @Id

@@ -18,7 +18,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "baskets")
+@Table(name = "baskets",indexes = {
+        @Index(name = "idx_user_id",columnList = "user_Id")
+})
 public class Basket {
 
     @Id

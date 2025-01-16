@@ -18,7 +18,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "products")
+@Table(name = "products",indexes = {
+        @Index(name = "idx_category_id",columnList = "category_id")
+})
 public class Product {
 
     @Id
