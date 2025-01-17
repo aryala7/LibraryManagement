@@ -1,6 +1,7 @@
 package la.arya.librarymanagement.service;
 
 import jakarta.transaction.Transactional;
+import la.arya.librarymanagement.dto.OrderResponse;
 import la.arya.librarymanagement.enums.OrderStatus;
 import la.arya.librarymanagement.model.Basket;
 import la.arya.librarymanagement.model.Order;
@@ -8,7 +9,9 @@ import la.arya.librarymanagement.model.OrderProduct;
 import la.arya.librarymanagement.repository.IBasketService;
 import la.arya.librarymanagement.repository.IOrderService;
 import la.arya.librarymanagement.repository.OrderRepository;
+import la.arya.librarymanagement.util.Hashid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,36 +22,30 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class OrderService implements IOrderService {
 
+    @Autowired
     private final OrderRepository orderRepository;
+
+    @Autowired
+    private final ModelMapper modelMapper;
 
     @Autowired
     private final IBasketService basketService;
 
+    @Autowired
+    private Hashid hashIdService;
+
     @Transactional
     @Override
-    public Order placeOrder(Long userId) {
-
+    public OrderResponse placeOrder(Long userId) {
         Basket basket = basketService.getBasketByUserId(userId);
-        Order order = createOrder(basket);
-        Set<OrderProduct> orderProducts = createOrderItems(basket,order);
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = createOrder(basket);
         basketService.clearBasket(basket.getId());
-
-        return savedOrder;
+        return convertToOrderResponse(savedOrder);
     }
 
     @Override
     public Order getOrderById(Long id) {
         return null;
-    }
-
-
-    private Set<OrderProduct> createOrderItems(Basket basket, Order order) {
-
-        basket.getBasketProducts().forEach(p -> {
-            order.addProduct(p.getProduct(),p.getPrice(),p.getQuantity());
-        });
-        return order.getOrderProducts();
     }
 
     public Order createOrder(Basket basket) {
@@ -57,10 +54,26 @@ public class OrderService implements IOrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(basket.getCreatedAt());
         order.setUpdatedAt(basket.getUpdatedAt());
-        return order;
+        basket.getBasketProducts().forEach(p -> {
+            order.addProduct(p.getProduct(),p.getPrice(),p.getQuantity());
+        });
+        return orderRepository.save(order);
     }
 
     public List<Order> getUserOrders(Long userId) {
         return orderRepository.getAllByUserIdWithProducts(userId);
     }
-}
+
+
+    @Override
+    public OrderResponse convertToOrderResponse(Order order) {
+        OrderResponse response =  modelMapper.map(order, OrderResponse.class);
+        response.setHashId(hashIdService.encode(order.getId()));
+        return response;
+    }
+
+    @Override
+    public List<OrderResponse> getConvertedOrders(List<Order> orders) {
+        return orders.stream().map(this::convertToOrderResponse).toList();
+    }
+ }

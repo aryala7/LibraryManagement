@@ -1,11 +1,18 @@
 package la.arya.librarymanagement.repository;
 
+import la.arya.librarymanagement.dto.OrderResponse;
 import la.arya.librarymanagement.model.Order;
+
+import java.util.List;
 
 public interface IOrderService {
 
-    public Order placeOrder(Long userId);
+    OrderResponse placeOrder(Long userId);
 
 
-    public Order getOrderById(Long id);
+    Order getOrderById(Long id);
+
+    OrderResponse convertToOrderResponse(Order order);
+
+    List<OrderResponse> getConvertedOrders(List<Order> orders);
 }

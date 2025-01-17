@@ -9,8 +9,6 @@ import la.arya.librarymanagement.repository.UserRepository;
 import la.arya.librarymanagement.request.user.CreateUserRequest;
 import la.arya.librarymanagement.request.user.UpdateUserRequest;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +54,8 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        userRepository.findById(userId).ifPresentOrElse(userRepository::delete, () -> System.out.println("User with id " + userId + " not found"));
+        userRepository
+                .findById(userId)
+                .ifPresentOrElse(userRepository::delete, () -> System.out.println("User with id " + userId + " not found"));
     }
 }

@@ -1,5 +1,6 @@
 package la.arya.librarymanagement.controller;
 
+import la.arya.librarymanagement.dto.OrderResponse;
 import la.arya.librarymanagement.model.Order;
 import la.arya.librarymanagement.repository.IOrderService;
 import la.arya.librarymanagement.response.ApiResponse;
@@ -20,8 +21,8 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse> createOrder(Long userId) {
-        Order order = orderService.placeOrder(userId);
-        return ResponseEntity.ok(new ApiResponse("",order));
+        OrderResponse response = orderService.placeOrder(userId);
+        return ResponseEntity.ok(new ApiResponse("",response));
     }
 
 }
