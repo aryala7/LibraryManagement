@@ -2,16 +2,20 @@ package la.arya.librarymanagement.service;
 
 
 import jakarta.persistence.EntityNotFoundException;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.dto.UserResponse;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.model.User;
 import la.arya.librarymanagement.repository.IUserService;
 import la.arya.librarymanagement.repository.UserRepository;
 import la.arya.librarymanagement.request.user.CreateUserRequest;
 import la.arya.librarymanagement.request.user.UpdateUserRequest;
+import la.arya.librarymanagement.util.Hashid;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +24,12 @@ public class UserService implements IUserService {
 
     @Autowired
     protected final UserRepository userRepository;
+
+    @Autowired
+    protected final ModelMapper modelMapper;
+
+
+    protected Hashid hashIdService;
 
     @Override
     public User getUserById(Long id) {
@@ -57,5 +67,17 @@ public class UserService implements IUserService {
         userRepository
                 .findById(userId)
                 .ifPresentOrElse(userRepository::delete, () -> System.out.println("User with id " + userId + " not found"));
+    }
+
+    @Override
+    public UserResponse mapToUserResponse(User user) {
+            UserResponse response =  modelMapper.map(user, UserResponse.class);
+            response.setHashId(hashIdService.encode(user.getId()));
+            return response;
+    }
+
+    @Override
+    public List<UserResponse> convertToUserResponse(List<User> users) {
+        return users.stream().map(this::mapToUserResponse).toList();
     }
 }

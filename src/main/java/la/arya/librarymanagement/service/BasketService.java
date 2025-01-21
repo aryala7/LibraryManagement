@@ -2,7 +2,7 @@ package la.arya.librarymanagement.service;
 
 import la.arya.librarymanagement.dto.BasketProductResponse;
 import la.arya.librarymanagement.dto.BasketResponse;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Basket;
 import la.arya.librarymanagement.model.BasketProduct;
 import la.arya.librarymanagement.model.Product;

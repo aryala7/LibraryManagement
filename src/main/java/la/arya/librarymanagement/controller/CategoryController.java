@@ -1,10 +1,8 @@
 package la.arya.librarymanagement.controller;
 
 import la.arya.librarymanagement.dto.CategoryResponse;
-import la.arya.librarymanagement.dto.ProductResponse;
-import la.arya.librarymanagement.excpetion.AlreadyExistsException;
+import la.arya.librarymanagement.exception.AlreadyExistsException;
 import la.arya.librarymanagement.model.Category;
-import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.CategoryRepository;
 import la.arya.librarymanagement.repository.ICategoryService;
 import la.arya.librarymanagement.repository.IProductService;
@@ -16,10 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/categories")

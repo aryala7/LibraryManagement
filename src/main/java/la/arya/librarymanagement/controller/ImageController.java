@@ -1,7 +1,7 @@
 package la.arya.librarymanagement.controller;
 
 import la.arya.librarymanagement.dto.ImageResponse;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.request.FileForm;
@@ -17,9 +17,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 @RestController

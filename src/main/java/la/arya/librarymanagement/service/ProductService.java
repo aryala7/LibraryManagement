@@ -1,11 +1,9 @@
 package la.arya.librarymanagement.service;
 
 import la.arya.librarymanagement.dto.CategoryResponse;
-import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.dto.ProductResponse;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Category;
-import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.*;
 import la.arya.librarymanagement.request.product.AddProductRequest;
@@ -16,7 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;

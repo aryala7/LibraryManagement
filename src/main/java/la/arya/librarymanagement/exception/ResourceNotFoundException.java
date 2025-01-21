@@ -1,4 +1,4 @@
-package la.arya.librarymanagement.excpetion;
+package la.arya.librarymanagement.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

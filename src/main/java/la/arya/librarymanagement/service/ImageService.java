@@ -3,7 +3,7 @@ package la.arya.librarymanagement.service;
 import la.arya.librarymanagement.model.Image;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.dto.ImageResponse;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.repository.ImageRepository;
 import la.arya.librarymanagement.util.checksumUtil;

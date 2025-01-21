@@ -51,6 +51,7 @@ public class User {
         Timestamp now = Timestamp.from(Instant.now());
         this.createdAt = now;
         this.updatedAt = now;
+        hashPassword();
     }
 
     @PreUpdate

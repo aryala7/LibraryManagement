@@ -3,7 +3,7 @@ package la.arya.librarymanagement.controller;
 import jakarta.validation.constraints.NotNull;
 import la.arya.librarymanagement.dto.ImageResponse;
 import la.arya.librarymanagement.dto.ProductResponse;
-import la.arya.librarymanagement.excpetion.ResourceNotFoundException;
+import la.arya.librarymanagement.exception.ResourceNotFoundException;
 import la.arya.librarymanagement.model.Product;
 import la.arya.librarymanagement.repository.IImageService;
 import la.arya.librarymanagement.repository.IProductService;
