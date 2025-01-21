@@ -121,6 +121,7 @@ public class BasketService implements IBasketService {
         BasketResponse response = modelMapper.map(basket, BasketResponse.class);
         List<BasketProductResponse> basketProductResponses = this.convertToBasketProductResponse(basket.getBasketProducts());
 
+        response.setUserHashId(hashIdService.encode(basket.getUser().getId()));
         response.setHashId(hashIdService.encode(basket.getId()));
         response.setProducts(basketProductResponses);
         return response;

@@ -3,6 +3,7 @@ package la.arya.librarymanagement.controller;
 import la.arya.librarymanagement.dto.OrderResponse;
 import la.arya.librarymanagement.model.Order;
 import la.arya.librarymanagement.repository.IOrderService;
+import la.arya.librarymanagement.request.order.AddOrderRequest;
 import la.arya.librarymanagement.response.ApiResponse;
 import la.arya.librarymanagement.util.Hashid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ public class OrderController {
     @Autowired
     protected  IOrderService orderService;
 
+    @Autowired
     protected Hashid hashIdService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createOrder(@RequestBody Long userId) {
+    public ResponseEntity<ApiResponse> createOrder(@RequestBody AddOrderRequest request) {
+        Long userId = hashIdService.decode(request.getUserId());
         OrderResponse response = orderService.placeOrder(userId);
         return ResponseEntity.ok(new ApiResponse("",response));
     }

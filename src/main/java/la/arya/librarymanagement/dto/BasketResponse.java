@@ -21,4 +21,6 @@ public class BasketResponse {
 
     private List<BasketProductResponse>  products;
 
+    private String userHashId;
+
 }

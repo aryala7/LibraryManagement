@@ -83,12 +83,14 @@ public class Order {
 
         OrderProductKey key = new OrderProductKey();
         key.setProductId(product.getId());
-        key.setOrderId(id);
+        key.setOrderId(this.id);
 
         orderProduct.setId(key);
         orderProduct.setTotalPrice(totalPrice);
         orderProduct.setQuantity(quantity);
         orderProduct.setProduct(product);
+
+        orderProduct.setOrder(this);
 
         this.orderProducts.add(orderProduct);
     }

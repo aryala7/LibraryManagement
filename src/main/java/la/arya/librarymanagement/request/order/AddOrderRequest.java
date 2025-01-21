@@ -7,9 +7,6 @@ import java.math.BigDecimal;
 @Data
 public class AddOrderRequest {
 
-    private BigDecimal price;
-
-    private Integer quantity;
-
+    private String userId;
 
 }
