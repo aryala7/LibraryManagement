@@ -2,7 +2,6 @@ services:
 
   godpostgresdb:
     image: postgres
-    restart: always
     shm_size: 256mb
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -13,7 +12,6 @@ services:
 
   adminer:
     image: adminer
-    restart: always
     ports:
       - 8081:8080
     depends_on:
@@ -23,7 +21,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
     ports:
       - "8080:8080"
     depends_on:
